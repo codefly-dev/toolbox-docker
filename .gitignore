@@ -1,0 +1,7 @@
+go.work
+go.work.sum
+/toolbox-docker
+/cmd/toolbox-docker/toolbox-docker
+.DS_Store
+.idea/
+.vscode/

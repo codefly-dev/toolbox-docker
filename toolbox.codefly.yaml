@@ -1,0 +1,30 @@
+name: docker
+version: 0.0.1
+description: |
+  Docker image and container inspection as typed RPCs. Canonical
+  owner of the `docker` binary — the bash toolbox refuses every
+  `docker` invocation and routes callers here.
+
+  Read-only by default: list_containers, list_images, inspect_container.
+  Mutating operations (run/stop/rm) are deliberately omitted in
+  Phase 1.
+
+agent:
+  kind: codefly:toolbox
+  name: docker
+  publisher: codefly.dev
+  version: 0.0.1
+
+sandbox:
+  read_paths: []
+  write_paths: []
+  network: deny
+  # The Docker daemon is talked to over its UNIX socket. Without
+  # access here every tool fails at the daemon-init step.
+  unix_sockets:
+    - "/var/run/docker.sock"
+
+canonical_for:
+  - docker
+
+spec: {}
