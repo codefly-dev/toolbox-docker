@@ -27,7 +27,7 @@
           pname = "toolbox-docker";
           version = "0.0.1";
           src = pkgs.lib.cleanSource ./.;
-          vendorHash = "sha256-wH4wjdktbN2dy+a+EI2X0yMp58a+ksf4syKBmvNSw+s=";
+          vendorHash = "sha256-V2bEW2mM77XABKhiyN6DNlU795/Uv9OheGdrmYSepBo=";
           # Build only the binary entrypoint, not the test packages —
           # `subPackages` keeps the nix build narrow + fast.
           subPackages = [ "cmd/toolbox-docker" ];
