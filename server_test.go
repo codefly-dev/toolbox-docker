@@ -2,6 +2,7 @@ package docker_test
 
 import (
 	"context"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -53,8 +54,14 @@ func TestDocker_InspectContainer_RequiresID(t *testing.T) {
 	})
 	require.NoError(t, err)
 	require.NotEmpty(t, resp.Error)
-	require.Contains(t, resp.Error, "id is required",
-		"missing id must be surfaced cleanly, not a daemon error")
+	// As of core@v0.1.159, registry.Base auto-validates against
+	// InputSchema BEFORE dispatching to the handler. The error
+	// shape is the JSON Schema validator's, which names the
+	// missing field via "missing property 'id'". Either form is
+	// an acceptable hint (the model needs to learn "I forgot id").
+	require.True(t,
+		strings.Contains(resp.Error, "id") || strings.Contains(resp.Error, "required"),
+		"missing id must surface a clear hint; got %q", resp.Error)
 }
 
 // Daemon-touching tests — only run when Docker is actually up.
