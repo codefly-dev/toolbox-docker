@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	toolboxv0 "github.com/codefly-dev/core/generated/go/codefly/services/toolbox/v0"
-	"github.com/codefly-dev/core/runners/base"
+	"github.com/codefly-dev/core/runners/dockerrun"
 	docker "github.com/codefly-dev/toolbox-docker"
 )
 
@@ -70,7 +70,7 @@ func TestDocker_InspectContainer_RequiresID(t *testing.T) {
 // when we add CI matrix that doesn't have Docker.
 
 func TestDocker_ListContainers_HitsDaemon(t *testing.T) {
-	if !base.DockerEngineRunning(context.Background()) {
+	if !dockerrun.DockerEngineRunning(context.Background()) {
 		t.Fatal("docker daemon not running; required for this integration test (or run with -tags skip_infra to exclude)")
 	}
 	srv := docker.New("0.0.1")
@@ -88,7 +88,7 @@ func TestDocker_ListContainers_HitsDaemon(t *testing.T) {
 }
 
 func TestDocker_ListImages_HitsDaemon(t *testing.T) {
-	if !base.DockerEngineRunning(context.Background()) {
+	if !dockerrun.DockerEngineRunning(context.Background()) {
 		t.Fatal("docker daemon not running; required for this integration test (or run with -tags skip_infra to exclude)")
 	}
 	srv := docker.New("0.0.1")
