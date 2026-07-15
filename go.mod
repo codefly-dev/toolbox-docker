@@ -5,10 +5,9 @@ go 1.25.0
 toolchain go1.26.4
 
 require (
-	github.com/codefly-dev/core v0.2.11
+	github.com/codefly-dev/core v0.2.18
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/stretchr/testify v1.11.1
-	google.golang.org/protobuf v1.36.11
 )
 
 require (
@@ -20,6 +19,7 @@ require (
 	github.com/Microsoft/go-winio v0.6.2 // indirect
 	github.com/antlr4-go/antlr/v4 v4.13.1 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/codefly-dev/gortk v0.2.0 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
 	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -80,5 +80,6 @@ require (
 	google.golang.org/genproto/googleapis/api v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260420184626-e10c466a9529 // indirect
 	google.golang.org/grpc v1.80.0 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

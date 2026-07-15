@@ -5,14 +5,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/image"
-	"github.com/docker/docker/client"
-	"google.golang.org/protobuf/types/known/structpb"
-
 	toolboxv0 "github.com/codefly-dev/core/generated/go/codefly/services/toolbox/v0"
 	"github.com/codefly-dev/core/toolbox/registry"
 	"github.com/codefly-dev/core/toolbox/respond"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/image"
+	"github.com/docker/docker/client"
 )
 
 // Server implements codefly.services.toolbox.v0.Toolbox for Docker
@@ -30,8 +28,6 @@ import (
 type Server struct {
 	*registry.Base
 
-	version string
-
 	// initOnce guards the one-shot Docker client creation. After it
 	// fires, cli + initErr are stable for the Server's lifetime.
 	initOnce sync.Once
@@ -41,8 +37,14 @@ type Server struct {
 
 // New returns a Server.
 func New(version string) *Server {
-	s := &Server{version: version}
-	s.Base = registry.NewBase(s)
+	s := &Server{}
+	s.Base = registry.NewBase(registry.Descriptor{
+		Name:           "docker",
+		Version:        version,
+		Description:    "Docker image and container inspection. Canonical owner of the `docker` binary.",
+		CanonicalFor:   []string{"docker"},
+		SandboxSummary: "needs unix socket /var/run/docker.sock; reads + writes deny by default",
+	}, s.Tools()...)
 	return s
 }
 
@@ -80,18 +82,6 @@ func (s *Server) dockerClient() (*client.Client, error) {
 	return s.cli, nil
 }
 
-// --- Identity ----------------------------------------------------
-
-func (s *Server) Identity(_ context.Context, _ *toolboxv0.IdentityRequest) (*toolboxv0.IdentityResponse, error) {
-	return &toolboxv0.IdentityResponse{
-		Name:        "docker",
-		Version:     s.version,
-		Description: "Docker image and container inspection. Canonical owner of the `docker` binary.",
-		CanonicalFor: []string{"docker"},
-		SandboxSummary: "needs unix socket /var/run/docker.sock; reads + writes deny by default",
-	}, nil
-}
-
 // --- Tools -------------------------------------------------------
 
 // Tools is the source of truth — all four RPC shapes project from
@@ -113,18 +103,18 @@ func (s *Server) Tools() []*registry.ToolDefinition {
 					},
 				},
 			}),
-			Tags:        []string{"docker", "read-only"},
+			Tags:        []string{"read-only"},
 			Idempotency: "idempotent",
 			ErrorModes:  "Returns 'docker list: ...' when the daemon is unreachable, or 'docker client init: ...' on connection setup failure.",
 			Examples: []*toolboxv0.ToolExample{
 				{
 					Description:     "List currently-running containers.",
-					Arguments:       mustDockerStruct(map[string]any{}),
+					Arguments:       respond.MustStruct(map[string]any{}),
 					ExpectedOutcome: "{ containers: [...] } — empty array if nothing's running.",
 				},
 				{
 					Description:     "Include stopped containers (post-mortem investigation).",
-					Arguments:       mustDockerStruct(map[string]any{"all": true}),
+					Arguments:       respond.MustStruct(map[string]any{"all": true}),
 					ExpectedOutcome: "Same shape, but includes containers in 'exited' state too.",
 				},
 			},
@@ -138,13 +128,13 @@ func (s *Server) Tools() []*registry.ToolDefinition {
 				"type":       "object",
 				"properties": map[string]any{},
 			}),
-			Tags:        []string{"docker", "read-only"},
+			Tags:        []string{"read-only"},
 			Idempotency: "idempotent",
 			ErrorModes:  "Returns 'docker image list: ...' when the daemon is unreachable.",
 			Examples: []*toolboxv0.ToolExample{
 				{
 					Description:     "Inventory the local image cache.",
-					Arguments:       mustDockerStruct(map[string]any{}),
+					Arguments:       respond.MustStruct(map[string]any{}),
 					ExpectedOutcome: "{ images: [{ id, repo_tags, size, created_unix }, ...] }",
 				},
 			},
@@ -166,27 +156,19 @@ func (s *Server) Tools() []*registry.ToolDefinition {
 				},
 				"required": []any{"id"},
 			}),
-			Tags:        []string{"docker", "read-only"},
+			Tags:        []string{"read-only"},
 			Idempotency: "idempotent",
 			ErrorModes:  "Returns 'docker.inspect_container: id is required' when id missing, 'inspect: ...' when the container doesn't exist or daemon is unreachable.",
 			Examples: []*toolboxv0.ToolExample{
 				{
 					Description:     "Inspect a container by short ID.",
-					Arguments:       mustDockerStruct(map[string]any{"id": "abc123"}),
+					Arguments:       respond.MustStruct(map[string]any{"id": "abc123"}),
 					ExpectedOutcome: "{ id, name, image, running, status, exit_code }.",
 				},
 			},
 			Handler: s.inspectContainer,
 		},
 	}
-}
-
-func mustDockerStruct(m map[string]any) *structpb.Struct {
-	s, err := structpb.NewStruct(m)
-	if err != nil {
-		panic(fmt.Sprintf("docker toolbox: cannot encode example args: %v", err))
-	}
-	return s
 }
 
 // --- Tool implementations ----------------------------------------

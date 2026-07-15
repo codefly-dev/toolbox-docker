@@ -1,5 +1,5 @@
 name: docker
-version: 0.0.1
+version: 0.0.9
 description: |
   Docker image and container inspection as typed RPCs. Canonical
   owner of the `docker` binary — the bash toolbox refuses every
@@ -13,7 +13,7 @@ agent:
   kind: codefly:toolbox
   name: docker
   publisher: codefly.dev
-  version: 0.0.1
+  version: 0.0.9
 
 sandbox:
   read_paths: []
