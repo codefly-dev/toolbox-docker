@@ -5,7 +5,7 @@ go 1.25.12
 toolchain go1.26.4
 
 require (
-	github.com/codefly-dev/core v0.3.3
+	github.com/codefly-dev/core v0.3.4
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/stretchr/testify v1.11.1
 )
