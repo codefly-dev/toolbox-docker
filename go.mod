@@ -3,7 +3,7 @@ module github.com/codefly-dev/toolbox-docker
 go 1.27.0
 
 require (
-	github.com/codefly-dev/core v0.4.0
+	github.com/codefly-dev/core v0.5.0
 	github.com/docker/docker v28.5.2+incompatible
 	github.com/stretchr/testify v1.12.1
 	gopkg.in/yaml.v3 v3.0.1
